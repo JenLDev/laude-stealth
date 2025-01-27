@@ -3,6 +3,9 @@ const cursor = document.querySelector('.cursor');
 const cursorDot = document.querySelector('.cursor-dot');
 const logo = document.querySelector('.main-logo');
 const lottieAnim = document.getElementById('lottie-animation');
+let mouseX = 0;
+let mouseY = 0;
+let hasMouseMoved = false;
 
 shapes.forEach(shape => {
     // Bigger random starting position
@@ -28,49 +31,70 @@ shapes.forEach(shape => {
     animate();
 });
 
-// Update cursor movement
-window.addEventListener('mousemove', e => {
-    // Instant movement for the dot with requestAnimationFrame for smoother performance
-    requestAnimationFrame(() => {
-        cursorDot.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+// Set initial opacity only
+gsap.set([cursor, cursorDot], { 
+    opacity: 0
+});
+
+// Track mouse position and initialize cursor
+window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    
+    // Initialize cursor position and show it on first mouse move
+    if (!hasMouseMoved) {
+        hasMouseMoved = true;
+        gsap.set([cursor, cursorDot], {
+            xPercent: -50,
+            yPercent: -50,
+            x: mouseX,
+            y: mouseY
+        });
+        gsap.to([cursor, cursorDot], {
+            opacity: 1,
+            duration: 0.3,
+            ease: 'power2.out'
+        });
+    }
+});
+
+// Use RAF for smoother animation
+function updateCursor() {
+    gsap.to(cursor, {
+        duration: 0.5,
+        x: mouseX,
+        y: mouseY,
+        ease: 'power2.out'
     });
     
-    // Faster, snappier movement for the larger cursor
-    gsap.to(cursor, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 0.15,  // Reduced from 0.2 to 0.15
-        ease: 'expo.out'  // Changed to expo.out for snappier movement
+    // Update dot position immediately
+    cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+    
+    requestAnimationFrame(updateCursor);
+}
+
+// Start the animation loop
+updateCursor();
+
+// Hover effects
+const interactiveElements = document.querySelectorAll('.main-logo, #lottie-animation');
+
+interactiveElements.forEach(el => {
+    el.addEventListener('mouseenter', () => {
+        gsap.to(cursor, {
+            scale: 2,
+            duration: 0.3,
+            ease: 'power2.out'
+        });
     });
-});
 
-// Make cursor disappear when leaving window
-document.addEventListener('mouseleave', () => {
-    cursor.style.opacity = '0';
-    cursorDot.style.opacity = '0';
-});
-
-document.addEventListener('mouseenter', () => {
-    cursor.style.opacity = '1';
-    cursorDot.style.opacity = '1';
-});
-
-// Add hover effect for logo
-logo.addEventListener('mouseenter', () => {
-    cursor.classList.add('grow');
-});
-
-logo.addEventListener('mouseleave', () => {
-    cursor.classList.remove('grow');
-});
-
-// Add hover effect for lottie animation
-lottieAnim.addEventListener('mouseenter', () => {
-    cursor.classList.add('grow');
-});
-
-lottieAnim.addEventListener('mouseleave', () => {
-    cursor.classList.remove('grow');
+    el.addEventListener('mouseleave', () => {
+        gsap.to(cursor, {
+            scale: 1,
+            duration: 0.3,
+            ease: 'power2.out'
+        });
+    });
 });
 
 let animation;
@@ -106,15 +130,32 @@ window.addEventListener('load', () => {
             onStart: () => {
                 animation.play();
                 
-                // Start the logo animation sooner
+                // Increased delay before logo animation starts
                 gsap.to('.main-logo', {
                     opacity: 1,
                     y: 0,
-                    duration: 2.5,  // Increased from 1.8 to 2.5 seconds
+                    duration: 3,
                     ease: 'power2.out',
-                    delay: 0.05  // Reduced from 0.45 to 0.05 seconds
+                    delay: 0.65 
                 });
             }
         });
+    });
+});
+
+// Add cursor visibility handling
+document.addEventListener('mouseleave', () => {
+    gsap.to([cursor, cursorDot], {
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power2.out'
+    });
+});
+
+document.addEventListener('mouseenter', () => {
+    gsap.to([cursor, cursorDot], {
+        opacity: 1,
+        duration: 0.3,
+        ease: 'power2.out'
     });
 }); 

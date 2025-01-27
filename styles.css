@@ -136,19 +136,20 @@ main {
     opacity: 0;
 }
 
-.cursor {
+.cursor, .cursor-dot {
     width: 60px;
     height: 60px;
     background: transparent;
     border: 9px solid rgba(255, 255, 255, 0.2);
     border-radius: 100%;
     position: fixed;
-    transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 9998;
     mix-blend-mode: difference;
-    transition: transform 0.3s ease, opacity 0.2s ease;
     will-change: transform;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    opacity: 0;
 }
 
 .cursor-dot {
@@ -157,12 +158,12 @@ main {
     background: white;
     border-radius: 100%;
     position: fixed;
-    transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 9999;
     mix-blend-mode: difference;
-    transition: opacity 0.2s ease;
     will-change: transform;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
 }
 
 .grow {
