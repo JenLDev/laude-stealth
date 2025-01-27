@@ -111,34 +111,43 @@ window.addEventListener('load', () => {
 
     // Set initial state
     gsap.set('#lottie-animation', {
-        rotateX: 90,
-        scale: 2.5,
+        rotateX: 110,
+        scale: 8,      // Increased initial scale for more dramatic start
         opacity: 0,
-        z: 500,
+        z: 2000,      // Increased depth for longer approach
         transformOrigin: "center center"
     });
 
     // Animate after a longer initial delay
     gsap.delayedCall(2, () => {
-        gsap.to('#lottie-animation', {
-            rotateX: 0,
+        const tl = gsap.timeline({
+            onStart: () => {
+                animation.play();
+            }
+        });
+
+        // Combined animation with overlapping
+        tl.to('#lottie-animation', {
             scale: 1,
             opacity: 1,
             z: 0,
-            duration: 3.75,
-            ease: 'power2.inOut',
-            onStart: () => {
-                animation.play();
-                
-                // Increased delay before logo animation starts
-                gsap.to('.main-logo', {
-                    opacity: 1,
-                    y: 0,
-                    duration: 3,
-                    ease: 'power2.out',
-                    delay: 0.65 
-                });
-            }
+            duration: 6.5,  // Much longer duration for the approach
+            ease: "power2.inOut"  // Changed to inOut for smoother approach and landing
+        })
+        // Start rotation when it's getting closer
+        .to('#lottie-animation', {
+            rotateX: 0,
+            duration: 4.5,  // Longer rotation
+            ease: "power1.inOut"  // Gentler easing for more floaty feel
+        }, "-=3.5");  // Start rotating earlier
+
+        // Add the logo animation
+        gsap.to('.main-logo', {
+            opacity: 1,
+            y: 0,
+            duration: 3,
+            ease: 'power2.out',
+            delay: 5.75  // Adjusted delay to match new timing
         });
     });
 });
